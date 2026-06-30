@@ -999,7 +999,7 @@ async function enviarFormulario(){
   try {
     const p = new URLSearchParams();
     Object.entries(d).forEach(([k,v]) => p.append(k,v));
-    await fetch(APPS_SCRIPT_URL, {method:'POST', body:p});
+    await fetch(APPS_SCRIPT_URL, {method:'POST', mode:'no-cors', body:p});
   } catch(_){}
   mostrarExito(d);
 }
