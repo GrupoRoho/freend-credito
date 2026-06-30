@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FREEND — Solicitud de Crédito</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+  /* ── RESET ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── TOKENS ── */
+  :root {
+    --ink:       #0D0A1E;
+    --violet:    #1A0066;
+    --purple:    #4B0082;
+    --mid:       #7B2FBE;
+    --soft:      #C084FC;
+    --lavender:  #EDE7F6;
+    --surface:   #F7F5FF;
+    --white:     #FFFFFF;
+    --border:    #D8CCF0;
+    --muted:     #7C6FA0;
+    --error:     #DC2626;
+    --success:   #16A34A;
+    --radius:    14px;
+    --radius-sm: 8px;
+    --shadow:    0 4px 24px rgba(26,0,102,0.10);
+    --shadow-lg: 0 16px 48px rgba(26,0,102,0.18);
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--surface);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--violet);
+    padding: 0 2rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(26,0,102,0.3);
+  }
+  .logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 0.08em;
+  }
+  .header-badge {
+    background: rgba(255,255,255,0.12);
+    color: var(--soft);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid rgba(192,132,252,0.3);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--violet) 0%, var(--purple) 60%, var(--mid) 100%);
+    padding: 3.5rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(192,132,252,0.15) 0%, transparent 70%);
+    top: -200px; right: -100px;
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(123,47,190,0.2) 0%, transparent 70%);
+    bottom: -150px; left: -80px;
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--soft);
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 0.8rem;
+  }
+  .hero p {
+    color: rgba(255,255,255,0.7);
+    font-size: 1rem;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* ── PROGRESS STEPS ── */
+  .steps-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 1.8rem 2rem 0;
+    position: relative;
+    z-index: 1;
+  }
+  .step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    flex: 1;
+    max-width: 140px;
+    position: relative;
+  }
+  .step-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 18px;
+    left: calc(50% + 18px);
+    width: calc(100% - 36px);
+    height: 2px;
+    background: rgba(255,255,255,0.2);
+    transition: background 0.4s;
+  }
+  .step-item.done:not(:last-child)::after,
+  .step-item.active:not(:last-child)::after {
+    background: var(--soft);
+  }
+  .step-circle {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700;
+    color: rgba(255,255,255,0.6);
+    transition: all 0.3s;
+  }
+  .step-item.active .step-circle {
+    background: var(--white);
+    border-color: var(--white);
+    color: var(--violet);
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.2);
+  }
+  .step-item.done .step-circle {
+    background: var(--soft);
+    border-color: var(--soft);
+    color: var(--violet);
+  }
+  .step-label {
+    font-size: 0.67rem;
+    font-weight: 500;
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .step-item.active .step-label,
+  .step-item.done .step-label { color: rgba(255,255,255,0.9); }
+
+  /* ── MAIN CARD ── */
+  main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 760px;
+    overflow: hidden;
+  }
+
+  /* ── FORM SECTIONS ── */
+  .form-section {
+    display: none;
+    padding: 2.4rem 2.4rem 1.6rem;
+    animation: fadeUp 0.35s ease;
+  }
+  .form-section.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    margin-bottom: 1.8rem;
+  }
+  .section-tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mid);
+    background: var(--lavender);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    margin-bottom: 0.6rem;
+  }
+  .section-header h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--violet);
+  }
+  .section-header p {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-top: 0.3rem;
+  }
+
+  /* ── GRID ── */
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+  }
+  .field-grid .full { grid-column: 1 / -1; }
+
+  /* ── FIELDS ── */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .field label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--purple);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .field label .req { color: var(--mid); margin-left: 2px; }
+
+  .field input,
+  .field select,
+  .field textarea {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    appearance: none;
+  }
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234B0082' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+  }
+  .field input:focus,
+  .field select:focus {
+    border-color: var(--mid);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(123,47,190,0.12);
+  }
+  .field input.error,
+  .field select.error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+  }
+  .field .hint {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .field .err-msg {
+    font-size: 0.72rem;
+    color: var(--error);
+    display: none;
+  }
+  .field.has-error .err-msg { display: block; }
+
+  /* ── TOGGLE INTERÉS AJUSTABLE ── */
+  .toggle-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+  }
+  .toggle-field .toggle-info { flex: 1; }
+  .toggle-field .toggle-info strong {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--ink);
+    display: block;
+  }
+  .toggle-field .toggle-info span {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .toggle {
+    position: relative;
+    width: 46px; height: 26px;
+    flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .slider::before {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    left: 3px; top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+  .toggle input:checked + .slider { background: var(--mid); }
+  .toggle input:checked + .slider::before { transform: translateX(20px); }
+
+  /* ── CUOTA PREVIEW ── */
+  .cuota-preview {
+    background: linear-gradient(135deg, var(--violet), var(--purple));
+    border-radius: var(--radius-sm);
+    padding: 1.2rem 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.2rem;
+  }
+  .cuota-preview .label {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .cuota-preview .amount {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--white);
+  }
+  .cuota-preview .tasa-badge {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 999px;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--soft);
+    white-space: nowrap;
+  }
+
+  /* ── RESUMEN ── */
+  .resumen-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+  }
+  .resumen-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.9rem 1rem;
+  }
+  .resumen-item .r-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 0.25rem;
+  }
+  .resumen-item .r-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--violet);
+    word-break: break-all;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1.6rem 0;
+  }
+
+  /* ── FOOTER BOTONES ── */
+  .form-footer {
+    padding: 1.4rem 2.4rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    gap: 1rem;
+  }
+  .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 0.82rem 1.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1.5px solid var(--border);
+  }
+  .btn-ghost:hover {
+    background: var(--surface);
+    color: var(--purple);
+    border-color: var(--purple);
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--purple), var(--mid));
+    color: var(--white);
+    box-shadow: 0 4px 16px rgba(75,0,130,0.3);
+  }
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(75,0,130,0.4);
+  }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled {
+    opacity: 0.6; cursor: not-allowed; transform: none;
+  }
+
+  /* ── SUCCESS ── */
+  .success-view {
+    display: none;
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+  .success-view.show { display: block; }
+  .success-icon {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, var(--purple), var(--mid));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2.2rem;
+  }
+  .success-view h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.6rem;
+    color: var(--violet);
+    margin-bottom: 0.6rem;
+  }
+  .success-view p {
+    color: var(--muted);
+    max-width: 380px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+  }
+  .success-code {
+    display: inline-block;
+    background: var(--lavender);
+    color: var(--purple);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 0.5rem 1.5rem;
+    border-radius: var(--radius-sm);
+    letter-spacing: 0.1em;
+    margin-bottom: 1.5rem;
+  }
+
+  /* ── SPINNER ── */
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .btn-primary.loading .spinner { display: block; }
+  .btn-primary.loading .btn-text { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── MOBILE ── */
+  @media (max-width: 580px) {
+    .field-grid { grid-template-columns: 1fr; }
+    .field-grid .full { grid-column: 1; }
+    .form-section { padding: 1.6rem 1.4rem 1rem; }
+    .form-footer { padding: 1.2rem 1.4rem 1.6rem; flex-direction: column; }
+    .btn { width: 100%; justify-content: center; }
+    .steps-bar { gap: 0; }
+    .step-label { display: none; }
+    .resumen-grid { grid-template-columns: 1fr; }
+    .cuota-preview { flex-direction: column; text-align: center; }
+  }
+
+  /* ── TOOLTIPS ── */
+  [data-tip] { position: relative; cursor: help; }
+  [data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%; transform: translateX(-50%);
+    background: var(--violet);
+    color: white;
+    font-size: 0.72rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 10;
+  }
+  [data-tip]:hover::after { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">FREEND</div>
+  <span class="header-badge">Solicitud de Crédito</span>
+</header>
+
+<!-- HERO + STEPS -->
+<div class="hero">
+  <div class="hero-eyebrow">Portal de crédito digital</div>
+  <h1>Inicia tu solicitud<br/>de crédito</h1>
+  <p>Completa los tres pasos en menos de 5 minutos. Aprobación sujeta a estudio de crédito.</p>
+
+  <div class="steps-bar">
+    <div class="step-item active" id="step-dot-1">
+      <div class="step-circle">1</div>
+      <span class="step-label">Identidad</span>
+    </div>
+    <div class="step-item" id="step-dot-2">
+      <div class="step-circle">2</div>
+      <span class="step-label">Crédito</span>
+    </div>
+    <div class="step-item" id="step-dot-3">
+      <div class="step-circle">3</div>
+      <span class="step-label">Confirmar</span>
+    </div>
+  </div>
+</div>
+
+<!-- CARD PRINCIPAL -->
+<main>
+  <div class="card">
+
+    <!-- ══ SECCIÓN 1: DATOS PERSONALES ══ -->
+    <div class="form-section active" id="section-1">
+      <div class="section-header">
+        <span class="section-tag">Paso 1 de 3</span>
+        <h2>Datos de identidad</h2>
+        <p>Necesitamos verificar quién eres antes de continuar.</p>
+      </div>
+
+      <div class="field-grid">
+        <div class="field full">
+          <label>Cédula de ciudadanía <span class="req">*</span></label>
+          <input type="text" id="cedula" placeholder="1234567890" maxlength="12" inputmode="numeric"/>
+          <span class="err-msg">Ingresa un número de cédula válido</span>
+        </div>
+
+        <div class="field full">
+          <label>Nombre completo <span class="req">*</span></label>
+          <input type="text" id="nombre" placeholder="Nombre y apellidos"/>
+          <span class="err-msg">Ingresa tu nombre completo</span>
+        </div>
+
+        <div class="field">
+          <label>Celular <span class="req">*</span></label>
+          <input type="tel" id="celular" placeholder="300 123 4567" maxlength="10" inputmode="numeric"/>
+          <span class="err-msg">Ingresa un celular válido (10 dígitos)</span>
+        </div>
+
+        <div class="field">
+          <label>Correo electrónico <span class="req">*</span></label>
+          <input type="email" id="correo" placeholder="correo@ejemplo.com"/>
+          <span class="err-msg">Ingresa un correo válido</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SECCIÓN 2: DATOS DEL CRÉDITO ══ -->
+    <div class="form-section" id="section-2">
+      <div class="section-header">
+        <span class="section-tag">Paso 2 de 3</span>
+        <h2>Condiciones del crédito</h2>
+        <p>Define el monto, la línea y el plan de pagos.</p>
+      </div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label>Valor del préstamo <span class="req">*</span></label>
+          <input type="text" id="valor" placeholder="$ 1,000,000" inputmode="numeric"/>
+          <span class="hint">Mínimo $500,000</span>
+          <span class="err-msg">Ingresa un valor válido</span>
+        </div>
+
+        <div class="field">
+          <label>Línea de crédito <span class="req">*</span></label>
+          <select id="linea">
+            <option value="">Seleccionar línea…</option>
+            <optgroup label="Pagaduría PLADANI · 9769">
+              <option value="AVANZA PLADANI">AVANZA PLADANI</option>
+              <option value="CREDIPLUS PLADANI">CREDIPLUS PLADANI</option>
+              <option value="TUCREDITO PLADANI">TUCREDITO PLADANI</option>
+              <option value="IMPULSO PLADANI">IMPULSO PLADANI</option>
+              <option value="VISION PLADANI">VISION PLADANI</option>
+              <option value="ORIGEN PLADANI">ORIGEN PLADANI</option>
+            </optgroup>
+            <optgroup label="FREEND Desembolsos · 8410">
+              <option value="AVANZA DESEMBOLSOS">AVANZA DESEMBOLSOS</option>
+              <option value="CREDIPLUS DESEMBOLSOS">CREDIPLUS DESEMBOLSOS</option>
+              <option value="TUCREDITO DESEMBOLSOS">TUCREDITO DESEMBOLSOS</option>
+              <option value="IMPULSO DESEMBOLSOS">IMPULSO DESEMBOLSOS</option>
+              <option value="VISION DESEMBOLSOS">VISION DESEMBOLSOS</option>
+              <option value="ORIGEN DESEMBOLSOS">ORIGEN DESEMBOLSOS</option>
+            </optgroup>
+            <optgroup label="FREEND II / SMASCREDIT · 9316">
+              <option value="FREEND II PRODUCTO">FREEND II PRODUCTO</option>
+              <option value="FREEND II DESEMBOLSOS">FREEND II DESEMBOLSOS</option>
+            </optgroup>
+            <optgroup label="Grupo ROHO SAS · 8102 — Producto">
+              <option value="AVANZA ROHO PRODUCTO">AVANZA ROHO PRODUCTO</option>
+              <option value="CREDIPLUS ROHO PRODUCTO">CREDIPLUS ROHO PRODUCTO</option>
+              <option value="TUCREDITO ROHO PRODUCTO">TUCREDITO ROHO PRODUCTO</option>
+              <option value="IMPULSO ROHO PRODUCTO">IMPULSO ROHO PRODUCTO</option>
+              <option value="VISION ROHO PRODUCTO">VISION ROHO PRODUCTO</option>
+              <option value="ORIGEN ROHO PRODUCTO">ORIGEN ROHO PRODUCTO</option>
+            </optgroup>
+            <optgroup label="Grupo ROHO SAS · 8102 — Desembolsos">
+              <option value="AVANZA ROHO DESEMBOLSOS">AVANZA ROHO DESEMBOLSOS</option>
+              <option value="CREDIPLUS ROHO DESEMBOLSOS">CREDIPLUS ROHO DESEMBOLSOS</option>
+              <option value="TUCREDITO ROHO DESEMBOLSOS">TUCREDITO ROHO DESEMBOLSOS</option>
+              <option value="IMPULSO ROHO DESEMBOLSOS">IMPULSO ROHO DESEMBOLSOS</option>
+              <option value="VISION ROHO DESEMBOLSOS">VISION ROHO DESEMBOLSOS</option>
+              <option value="ORIGEN ROHO DESEMBOLSOS">ORIGEN ROHO DESEMBOLSOS</option>
+            </optgroup>
+          </select>
+          <span class="err-msg">Selecciona una línea de crédito</span>
+        </div>
+
+        <div class="field">
+          <label>Número de cuotas <span class="req">*</span></label>
+          <select id="cuotas">
+            <option value="">Seleccionar plazo…</option>
+            <!-- Generado por JS: 1 a 100 meses -->
+          </select>
+          <span class="err-msg">Selecciona el número de cuotas</span>
+        </div>
+
+        <div class="field">
+          <label>Periodicidad <span class="req">*</span></label>
+          <select id="periodicidad">
+            <option value="">Seleccionar…</option>
+            <option value="Mensual">Mensual</option>
+            <option value="Quincenal">Quincenal</option>
+          </select>
+          <span class="err-msg">Selecciona la periodicidad</span>
+        </div>
+
+        <div class="field">
+          <label>Día de corte <span class="req">*</span></label>
+          <select id="dia-corte">
+            <option value="">Seleccionar día…</option>
+            <option value="5">Día 5</option>
+            <option value="15">Día 15</option>
+            <option value="20">Día 20</option>
+            <option value="30">Día 30</option>
+          </select>
+          <span class="err-msg">Selecciona el día de corte</span>
+        </div>
+
+        <div class="field">
+          <label>Fecha primera cuota <span class="req">*</span></label>
+          <input type="date" id="fecha-primera"/>
+          <span class="hint" id="hint-fecha">Selecciona primero el día de corte</span>
+          <span class="err-msg">Selecciona la fecha de la primera cuota</span>
+        </div>
+
+        <!-- CUOTA CALCULADA -->
+        <div class="field full" id="cuota-preview-wrap" style="display:none">
+          <label data-tip="Calculada con tasa plena total mensual (amortización francesa)">
+            Valor de cuota estimada ℹ️
+          </label>
+          <div class="cuota-preview">
+            <div>
+              <div class="label">Cuota mensual</div>
+              <div class="amount" id="cuota-display">$ —</div>
+            </div>
+            <div class="tasa-badge" id="tasa-display">Tasa —</div>
+          </div>
+          <input type="hidden" id="valor-cuota"/>
+          <input type="hidden" id="interes-aj-val"/>
+          <input type="hidden" id="primera-cuota-total"/>
+        </div>
+
+        <!-- ALERTA INTERÉS AJUSTABLE (automático) -->
+        <div class="field full" id="aj-alert" style="display:none">
+          <div style="background:#FFF0F0;border:1.5px solid #FCA5A5;border-radius:8px;padding:1rem 1.1rem;font-size:0.84rem;color:#991B1B;line-height:1.6">
+            <strong style="display:block;margin-bottom:0.3rem">⚠️ Aplica interés ajustable en la primera cuota</strong>
+            La diferencia entre hoy y la fecha de primera cuota es <strong id="aj-dias"></strong> días (más de 30 días).
+            Se adicionan <strong id="aj-monto"></strong> a la primera cuota.<br/>
+            <span style="font-weight:700">Primera cuota total: <span id="primera-total-display"></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SECCIÓN 3: CONFIRMACIÓN ══ -->
+    <div class="form-section" id="section-3">
+      <div class="section-header">
+        <span class="section-tag">Paso 3 de 3</span>
+        <h2>Confirma tu solicitud</h2>
+        <p>Revisa que todo esté correcto antes de enviar.</p>
+      </div>
+
+      <div class="resumen-grid" id="resumen-container">
+        <!-- Llenado por JS -->
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;text-transform:none;font-size:0.85rem;color:var(--ink)">
+          <input type="checkbox" id="acepto-terminos" style="width:16px;height:16px;accent-color:var(--mid)"/>
+          Acepto los <a href="https://freend.co" target="_blank" style="color:var(--mid)">términos y condiciones</a> de FREEND y autorizo el tratamiento de mis datos personales.
+        </label>
+      </div>
+    </div>
+
+    <!-- ══ SUCCESS ══ -->
+    <div class="success-view" id="success-view">
+      <div class="success-icon">✓</div>
+      <h2>¡Solicitud enviada!</h2>
+      <p>Tu solicitud fue registrada exitosamente. Un asesor FREEND te contactará pronto.</p>
+      <div class="success-code" id="ref-code">REF-000000</div>
+      <button class="btn btn-primary" onclick="resetForm()">
+        <span class="btn-text">Nueva solicitud</span>
+      </button>
+    </div>
+
+    <!-- FOOTER BOTONES -->
+    <div class="form-footer" id="form-footer">
+      <button class="btn btn-ghost" id="btn-back" onclick="prevStep()" style="visibility:hidden">
+        ← Anterior
+      </button>
+      <button class="btn btn-primary" id="btn-next" onclick="nextStep()">
+        <div class="spinner"></div>
+        <span class="btn-text">Continuar →</span>
+      </button>
+    </div>
+  </div>
+</main>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHkOcpBF2bZLanvF9QdHH0zXLXBd_-OTDH0FJnuJnQoMeHB5aUIU3KtPCN4a8iqESOaw/exec";
+
+// ── Tasas plenas totales
+const TASAS = {
+  "AVANZA PLADANI":0.06,"CREDIPLUS PLADANI":0.07,"TUCREDITO PLADANI":0.08,
+  "IMPULSO PLADANI":0.09,"VISION PLADANI":0.10,"ORIGEN PLADANI":0.11,
+  "AVANZA DESEMBOLSOS":0.06,"CREDIPLUS DESEMBOLSOS":0.07,"TUCREDITO DESEMBOLSOS":0.08,
+  "IMPULSO DESEMBOLSOS":0.09,"VISION DESEMBOLSOS":0.10,"ORIGEN DESEMBOLSOS":0.11,
+  "FREEND II PRODUCTO":0.11,"FREEND II DESEMBOLSOS":0.11,
+  "AVANZA ROHO PRODUCTO":0.05,"CREDIPLUS ROHO PRODUCTO":0.06,"TUCREDITO ROHO PRODUCTO":0.07,
+  "IMPULSO ROHO PRODUCTO":0.08,"VISION ROHO PRODUCTO":0.09,"ORIGEN ROHO PRODUCTO":0.10,
+  "AVANZA ROHO DESEMBOLSOS":0.05,"CREDIPLUS ROHO DESEMBOLSOS":0.06,"TUCREDITO ROHO DESEMBOLSOS":0.07,
+  "IMPULSO ROHO DESEMBOLSOS":0.08,"VISION ROHO DESEMBOLSOS":0.09,"ORIGEN ROHO DESEMBOLSOS":0.10,
+};
+
+// ── Llenar cuotas 1-100
+const selCuotas = document.getElementById('cuotas');
+for(let i=1; i<=100; i++){
+  const o = document.createElement('option');
+  o.value = i;
+  o.textContent = i + (i===1 ? ' mes' : ' meses');
+  selCuotas.appendChild(o);
+}
+
+let currentStep = 1;
+const TOTAL_STEPS = 3;
+const hoy = new Date(); hoy.setHours(0,0,0,0);
+
+// ── Formato moneda
+const fmtMoney = n => '$ ' + Math.round(n).toLocaleString('es-CO');
+const parseMoney = s => parseInt((s||'').replace(/[^0-9]/g,'')) || 0;
+
+// ── Auto-format valor
+document.getElementById('valor').addEventListener('input', function() {
+  const raw = this.value.replace(/[^0-9]/g,'');
+  this.value = raw ? '$ ' + parseInt(raw).toLocaleString('es-CO') : '';
+  calcular();
+});
+
+// ── Día de corte → sugerir fechas
+document.getElementById('dia-corte').addEventListener('change', function() {
+  const dia = parseInt(this.value);
+  const inp = document.getElementById('fecha-primera');
+  const hint = document.getElementById('hint-fecha');
+  if(!dia){ hint.textContent='Selecciona primero el día de corte'; return; }
+  const fechas = [];
+  for(let m=0; m<5 && fechas.length<3; m++){
+    const f = new Date(hoy.getFullYear(), hoy.getMonth()+m, dia);
+    if(f > hoy) fechas.push(f);
+  }
+  inp.min = fechas[0]?.toISOString().split('T')[0] || '';
+  hint.textContent = 'Próximas fechas: ' + fechas.map(f=>f.toLocaleDateString('es-CO')).join(' · ');
+  calcular();
+});
+
+// ── Recalcular al cambiar campos
+['linea','cuotas','fecha-primera'].forEach(id =>
+  document.getElementById(id).addEventListener('change', calcular)
+);
+
+function getTasa(){
+  return TASAS[document.getElementById('linea').value] || 0;
+}
+
+function calcular(){
+  const P = parseMoney(document.getElementById('valor').value);
+  const r = getTasa();
+  const n = parseInt(document.getElementById('cuotas').value) || 0;
+  const fechaStr = document.getElementById('fecha-primera').value;
+  const wrap = document.getElementById('cuota-preview-wrap');
+  const alert = document.getElementById('aj-alert');
+
+  if(!P || !r || !n){ wrap.style.display='none'; alert.style.display='none'; return; }
+
+  // Cuota francesa
+  const cuota = P*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
+  document.getElementById('cuota-display').textContent = fmtMoney(cuota);
+  document.getElementById('tasa-display').textContent  = `Tasa ${(r*100).toFixed(0)}% mensual`;
+  document.getElementById('valor-cuota').value = Math.round(cuota);
+  wrap.style.display = 'block';
+
+  // Interés ajustable automático
+  let ajVal = 0, primeraTotal = cuota;
+  if(fechaStr){
+    const primera = new Date(fechaStr); primera.setHours(0,0,0,0);
+    const dias = Math.round((primera - hoy)/(1000*60*60*24));
+    if(dias > 30){
+      ajVal = P * (r/30) * dias;
+      primeraTotal = cuota + ajVal;
+      document.getElementById('aj-dias').textContent = dias;
+      document.getElementById('aj-monto').textContent = fmtMoney(ajVal);
+      document.getElementById('primera-total-display').textContent = fmtMoney(primeraTotal);
+      alert.style.display = 'block';
+    } else {
+      alert.style.display = 'none';
+    }
+  }
+  document.getElementById('interes-aj-val').value = Math.round(ajVal);
+  document.getElementById('primera-cuota-total').value = Math.round(primeraTotal);
+}
+
+// ── Navegación
+function goTo(step){
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  document.getElementById(`section-${step}`).classList.add('active');
+  for(let i=1; i<=TOTAL_STEPS; i++){
+    const dot = document.getElementById(`step-dot-${i}`);
+    dot.classList.remove('active','done');
+    if(i < step) dot.classList.add('done');
+    else if(i === step) dot.classList.add('active');
+    dot.querySelector('.step-circle').textContent = i < step ? '✓' : i;
+  }
+  document.getElementById('btn-back').style.visibility = step>1 ? 'visible' : 'hidden';
+  document.getElementById('btn-next').querySelector('.btn-text').textContent =
+    step===TOTAL_STEPS ? 'Enviar solicitud ✓' : 'Continuar →';
+  if(step===3) buildResumen();
+  currentStep = step;
+}
+
+function nextStep(){ if(validarPaso(currentStep)){ currentStep<TOTAL_STEPS ? goTo(currentStep+1) : enviarFormulario(); } }
+function prevStep(){ if(currentStep>1) goTo(currentStep-1); }
+
+// ── Validación
+function validarPaso(step){
+  if(step===3){
+    if(!document.getElementById('acepto-terminos').checked){
+      alert('Debes aceptar los términos y condiciones.'); return false;
+    }
+    return true;
+  }
+  const campos = {
+    1:['cedula','nombre','celular','correo'],
+    2:['valor','linea','cuotas','periodicidad','dia-corte','fecha-primera']
+  };
+  let ok = true;
+  (campos[step]||[]).forEach(id => {
+    const el = document.getElementById(id);
+    const wrap = el.closest('.field');
+    let v = true;
+    const val = el.value.trim();
+    if(id==='cedula' && !/^\d{6,12}$/.test(val)) v=false;
+    else if(id==='nombre' && val.length<5) v=false;
+    else if(id==='celular' && !/^3\d{9}$/.test(val)) v=false;
+    else if(id==='correo' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) v=false;
+    else if(id==='valor' && parseMoney(el.value)<500000) v=false;
+    else if((el.tagName==='SELECT'||el.type==='date') && !el.value) v=false;
+    el.classList.toggle('error',!v);
+    wrap.classList.toggle('has-error',!v);
+    if(!v) ok=false;
+  });
+  return ok;
+}
+
+// ── Resumen
+function buildResumen(){
+  const d = getDatos();
+  const ajStr = d.interesAj > 0 ? fmtMoney(d.interesAj) + ' adicionales' : 'No aplica';
+  const items = [
+    ['Cédula', d.cedula], ['Nombre', d.nombre],
+    ['Celular', d.celular], ['Correo', d.correo],
+    ['Préstamo', fmtMoney(parseMoney(d.valor))], ['Línea de crédito', d.linea],
+    ['N° cuotas', d.cuotas + ' meses'], ['Periodicidad', d.periodicidad],
+    ['Cuota regular', fmtMoney(+d.valorCuota)],
+    ['Interés ajustable', ajStr],
+    ['Primera cuota total', fmtMoney(+d.primeraTotal)],
+    ['Día de corte', 'Día ' + d.diaCorte],
+    ['Fecha primera cuota', d.fechaPrimera],
+  ];
+  document.getElementById('resumen-container').innerHTML = items.map(([l,v]) =>
+    `<div class="resumen-item"><div class="r-label">${l}</div><div class="r-value">${v||'—'}</div></div>`
+  ).join('');
+}
+
+function getDatos(){
+  return {
+    cedula:       document.getElementById('cedula').value.trim(),
+    nombre:       document.getElementById('nombre').value.trim(),
+    celular:      document.getElementById('celular').value.trim(),
+    correo:       document.getElementById('correo').value.trim(),
+    valor:        document.getElementById('valor').value,
+    linea:        document.getElementById('linea').value,
+    cuotas:       document.getElementById('cuotas').value,
+    periodicidad: document.getElementById('periodicidad').value,
+    diaCorte:     document.getElementById('dia-corte').value,
+    fechaPrimera: document.getElementById('fecha-primera').value,
+    valorCuota:   document.getElementById('valor-cuota').value,
+    interesAj:    parseInt(document.getElementById('interes-aj-val').value)||0,
+    primeraTotal: document.getElementById('primera-cuota-total').value,
+    timestamp:    new Date().toLocaleString('es-CO'),
+  };
+}
+
+// ── Envío
+async function enviarFormulario(){
+  const btn = document.getElementById('btn-next');
+  btn.classList.add('loading'); btn.disabled = true;
+  const d = getDatos();
+  try {
+    const p = new URLSearchParams();
+    Object.entries(d).forEach(([k,v]) => p.append(k,v));
+    await fetch(APPS_SCRIPT_URL, {method:'POST', body:p});
+  } catch(_){}
+  mostrarExito(d);
+}
+
+function mostrarExito(datos){
+  document.querySelectorAll('.form-section').forEach(s => s.style.display='none');
+  document.getElementById('form-footer').style.display = 'none';
+  document.getElementById('success-view').classList.add('show');
+  document.getElementById('ref-code').textContent =
+    'FRD-' + datos.cedula.slice(-4) + '-' + Date.now().toString().slice(-5);
+}
+
+function resetForm(){ location.reload(); }
+</script>
+</body>
+</html>
